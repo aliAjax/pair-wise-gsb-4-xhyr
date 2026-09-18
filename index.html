@@ -1,5 +1,270 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>License Lens · 依赖许可证分析</title><style>
-:root{--bg:#f4f7fb;--ink:#15202b;--muted:#718096;--line:#dfe6ef;--blue:#3977f6;--green:#1b9c78;--amber:#c98b18;--red:#d95459}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,system-ui,sans-serif}.app{max-width:1280px;margin:auto;padding:26px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{display:flex;align-items:center;gap:11px}.logo{width:38px;height:38px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}.brand h1{margin:0;font-size:21px}.brand small{color:var(--muted)}.actions{display:flex;gap:8px}button{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 13px;border-radius:8px;cursor:pointer}button:hover{border-color:var(--blue);color:var(--blue)}.primary{background:var(--blue);border-color:var(--blue);color:white;font-weight:700}.summary{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px}.metric{background:white;border:1px solid var(--line);border-radius:12px;padding:17px}.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric b{font-size:25px}.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.grid{display:grid;grid-template-columns:330px 1fr;gap:16px}.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:17px}.panel h3{font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin:0 0 13px}.textarea{width:100%;min-height:180px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:11px;line-height:1.6;font:12px ui-monospace,monospace}.drop{border:1px dashed #aab9cb;border-radius:9px;padding:15px;text-align:center;color:var(--muted);margin-top:10px}.drop input{display:none}.drop label{color:var(--blue);cursor:pointer}.hint{color:var(--muted);font-size:12px;line-height:1.6}.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.filters button{font-size:12px;padding:6px 9px}.filters button.active{background:var(--ink);color:#fff}.row{display:grid;grid-template-columns:1.3fr .8fr .9fr 1fr 70px;align-items:center;gap:12px;border-top:1px solid var(--line);padding:14px 4px}.row.head{border-top:0;padding-top:0;color:var(--muted);font-size:12px}.pkg{display:flex;align-items:center;gap:9px}.pkgicon{width:28px;height:28px;border-radius:7px;background:#e8efff;color:var(--blue);display:grid;place-items:center;font-weight:700}.version{color:var(--muted);font-size:12px}.license{font-family:ui-monospace,monospace;font-size:12px}.badge{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px}.ok{background:#e3f7ef;color:#147455}.review{background:#fff3d8;color:#996a0d}.risk{background:#ffe3e5;color:#a93942}.inspect{color:var(--blue);font-size:12px;cursor:pointer}.notice{background:#fff9e9;border:1px solid #f0d89d;border-radius:9px;padding:12px;color:#835d12;margin-top:15px;font-size:12px;line-height:1.6}.details{margin-top:15px;background:#f7f9fc;border-radius:9px;padding:13px;display:none}.details h4{margin:0 0 7px}.details p{margin:5px 0;color:var(--muted);line-height:1.5}.manual{display:flex;gap:8px;margin-top:12px}.manual input,.manual select{border:1px solid var(--line);border-radius:7px;padding:8px;min-width:0}.status{color:var(--green);font-size:12px;min-height:18px;margin-top:8px}@media(max-width:850px){.summary{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.row{grid-template-columns:1.2fr .7fr .8fr 1fr 50px}}@media(max-width:600px){.app{padding:13px}.top{align-items:flex-start;gap:10px;flex-direction:column}.summary{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 70px 70px}.row>:nth-child(3),.row>:nth-child(4){display:none}}
-</style></head><body><main class="app"><header class="top"><div class="brand"><div class="logo">L</div><div><h1>License Lens</h1><small>依赖许可证兼容性分析</small></div></div><div class="actions"><button id="reset">重置示例</button><button id="export" class="primary">导出 Markdown</button></div></header><section class="summary"><div class="metric"><small>已分析依赖</small><b id="total">8</b></div><div class="metric"><small>兼容通过</small><b class="good" id="pass">5</b></div><div class="metric"><small>需要复核</small><b class="warn" id="review">2</b></div><div class="metric"><small>高风险冲突</small><b class="bad" id="risk">1</b></div></section><section class="grid"><aside class="panel"><h3>导入依赖清单</h3><textarea id="input" class="textarea" spellcheck="false"></textarea><button id="analyze" class="primary" style="width:100%;margin-top:10px">开始分析</button><div class="drop">拖放 package.json 或许可证清单<br><label for="file">选择文件<input id="file" type="file" accept=".txt,.json,.csv,.lock"></label></div><p class="hint">支持每行一个依赖，格式：<code>名称@版本 许可证</code>。未识别许可证会标记为需复核。</p><div class="manual"><input id="manualName" placeholder="依赖名"><select id="manualLicense"><option>MIT</option><option>Apache-2.0</option><option>GPL-3.0</option><option>BSD-3-Clause</option><option>Proprietary</option></select><button id="add">添加</button></div><div class="status" id="status"></div></aside><section class="panel"><h3>分析结果</h3><div class="filters"><button class="active" data-filter="all">全部 <span id="fAll">8</span></button><button data-filter="ok">兼容通过</button><button data-filter="review">需复核</button><button data-filter="risk">高风险</button><input id="search" placeholder="搜索依赖…" style="margin-left:auto;border:1px solid var(--line);border-radius:7px;padding:7px;max-width:140px"></div><div class="row head"><div>依赖</div><div>版本</div><div>许可证</div><div>结论</div><div></div></div><div id="results"></div><div class="notice"><b>兼容性提示</b><br>GPL-3.0 组件要求衍生作品以 GPL 方式发布；专有许可证通常不能与开源分发直接兼容。请在发布前让法务复核结论。</div><div class="details" id="details"></div></section></section></main><script>
-const seed=['react@18.3.1 MIT','lodash@4.17.21 MIT','sharp@0.33.4 Apache-2.0','some-proprietary@1.0.0 Proprietary','legacy-gpl@2.4.0 GPL-3.0','axios@1.7.2 MIT','zod@3.23.8 MIT','font-awesome@6.5.2 CC-BY-4.0'].join('\n');let rows=[],filter='all';const known={MIT:'ok',Apache:'ok','Apache-2.0':'ok','BSD-3-Clause':'ok','CC-BY-4.0':'review','GPL-3.0':'risk',Proprietary:'review'};document.querySelector('#input').value=seed;function parse(){rows=document.querySelector('#input').value.split(/\n|,/).map(s=>s.trim()).filter(Boolean).map((s,i)=>{let m=s.match(/^(.+?)@([\w.-]+)\s+(.+)$/);let name=m?m[1]:s,version=m?m[2]:'—',lic=m?m[3]:'Unknown';let state=known[lic]||'review';return{id:i,name,version,lic,state,reason:state==='ok'?'许可证允许在保留声明后分发':state==='risk'?'Copyleft 条款可能与本项目分发方式冲突':'需要确认许可证文本与使用方式'}});render()}function render(){let q=document.querySelector('#search').value.toLowerCase(),out=document.querySelector('#results');out.innerHTML='';rows.filter(r=>(filter==='all'||r.state===filter)&&r.name.toLowerCase().includes(q)).forEach(r=>{let d=document.createElement('div');d.className='row';d.innerHTML=`<div class="pkg"><div class="pkgicon">◈</div><div><b>${r.name}</b><br><span class="version">package dependency</span></div></div><div class="version">${r.version}</div><div class="license">${r.lic}</div><div><span class="badge ${r.state}">${r.state==='ok'?'兼容通过':r.state==='risk'?'高风险':'需复核'}</span></div><div class="inspect" data-id="${r.id}">查看依据</div>`;out.append(d)});document.querySelector('#total').textContent=rows.length;document.querySelector('#pass').textContent=rows.filter(r=>r.state==='ok').length;document.querySelector('#review').textContent=rows.filter(r=>r.state==='review').length;document.querySelector('#risk').textContent=rows.filter(r=>r.state==='risk').length;document.querySelector('#fAll').textContent=rows.length}document.querySelector('#analyze').onclick=()=>{parse();document.querySelector('#status').textContent='分析完成 · 已检查 '+rows.length+' 条依赖'};document.querySelector('#search').oninput=render;document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()});document.querySelector('#results').onclick=e=>{let id=e.target.dataset.id;if(id===undefined)return;let r=rows.find(x=>x.id==id),d=document.querySelector('#details');d.style.display='block';d.innerHTML=`<h4>${r.name} · ${r.lic}</h4><p>${r.reason}</p><p>分析依据：识别到 SPDX 标识 <code>${r.lic}</code>，结合常见分发条款给出初步结论。</p>`};document.querySelector('#add').onclick=()=>{let n=document.querySelector('#manualName').value.trim();if(n){document.querySelector('#input').value+=`\n${n}@1.0.0 ${document.querySelector('#manualLicense').value}`;parse();document.querySelector('#manualName').value=''}};document.querySelector('#file').onchange=e=>{let f=e.target.files[0];if(f){let r=new FileReader();r.onload=()=>{document.querySelector('#input').value=r.result;parse()};r.readAsText(f)}};document.querySelector('#reset').onclick=()=>{document.querySelector('#input').value=seed;parse()};document.querySelector('#export').onclick=()=>{let md='# License Lens 分析报告\n\n| 依赖 | 版本 | 许可证 | 结论 |\n|---|---|---|---|\n'+rows.map(r=>`| ${r.name} | ${r.version} | ${r.lic} | ${r.state} |`).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'}));a.download='license-report.md';a.click();document.querySelector('#status').textContent='Markdown 报告已导出'};parse();
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>License Lens · 合规裁决台</title><style>
+:root{--bg:#f4f7fb;--ink:#15202b;--muted:#718096;--line:#dfe6ef;--blue:#3977f6;--green:#1b9c78;--amber:#c98b18;--red:#d95459}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,system-ui,sans-serif}.app{max-width:1280px;margin:auto;padding:26px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.brand{display:flex;align-items:center;gap:11px}.logo{width:38px;height:38px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}.brand h1{margin:0;font-size:21px}.brand small{color:var(--muted)}.actions{display:flex;gap:8px;align-items:center}button{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 13px;border-radius:8px;cursor:pointer}button:hover{border-color:var(--blue);color:var(--blue)}.primary{background:var(--blue);border-color:var(--blue);color:white;font-weight:700}.primary:hover{color:#fff}.rule-badge{font-size:12px;color:var(--blue);background:#e8efff;border-radius:99px;padding:5px 11px}.summary{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px}.metric{background:white;border:1px solid var(--line);border-radius:12px;padding:17px}.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric b{font-size:25px}.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}.grid{display:grid;grid-template-columns:330px 1fr;gap:16px}.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:17px}.panel h3{font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin:0 0 13px}.panel select,.panel input[type=text]{border:1px solid var(--line);border-radius:7px;padding:8px;font:inherit;background:#fff;color:var(--ink)}.textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:11px;line-height:1.6;font:12px ui-monospace,monospace;margin-top:8px}.drop{border:1px dashed #aab9cb;border-radius:9px;padding:13px;text-align:center;color:var(--muted);margin-top:10px;font-size:12px}.drop input{display:none}.drop label{color:var(--blue);cursor:pointer}.hint{color:var(--muted);font-size:12px;line-height:1.6}.mlist{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}.mitem{border:1px solid var(--line);border-radius:10px;padding:11px 12px;cursor:pointer;text-align:left;width:100%;background:#fff;color:var(--ink)}.mitem:hover{border-color:var(--blue)}.mitem.active{border-color:var(--blue);box-shadow:0 4px 14px #3977f614}.mitem b{font-size:13px}.mitem>small{display:block;color:var(--muted);margin-top:3px;font-size:11px}.mbadges{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}.divider{border-top:1px solid var(--line);margin:16px 0}.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.filters button{font-size:12px;padding:6px 9px}.filters button.active{background:var(--ink);color:#fff}.row{display:grid;grid-template-columns:1.4fr .9fr 1.1fr 55px 55px;align-items:center;gap:12px;border-top:1px solid var(--line);padding:13px 4px}.row.head{border-top:0;padding-top:0;color:var(--muted);font-size:12px}.pkg{display:flex;align-items:center;gap:9px;min-width:0}.pkgicon{width:28px;height:28px;border-radius:7px;background:#e8efff;color:var(--blue);display:grid;place-items:center;font-weight:700;flex:none}.version{color:var(--muted);font-size:12px}.license{font-family:ui-monospace,monospace;font-size:12px}.badge{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;white-space:nowrap}.ok{background:#e3f7ef;color:#147455}.review{background:#fff3d8;color:#996a0d}.risk{background:#ffe3e5;color:#a93942}.ovmark{display:block;font-size:10px;color:#996a0d;margin-top:3px}.inspect{color:var(--blue);font-size:12px;cursor:pointer;white-space:nowrap}.override-btn{font-size:12px;padding:5px 8px;color:var(--muted)}.notice{background:#fff9e9;border:1px solid #f0d89d;border-radius:9px;padding:12px;color:#835d12;margin-top:15px;font-size:12px;line-height:1.6}.notice.guard{background:#fff1f2;border-color:#f3c2c6;color:#a93942}.details{margin-top:15px;background:#f7f9fc;border-radius:9px;padding:13px;display:none}.details h4{margin:0 0 7px}.details p{margin:5px 0;color:var(--muted);line-height:1.5}.hist{margin:9px 0 0;padding-left:17px;font-size:12px;color:var(--muted);line-height:1.9}.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}.controls label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}.mhead h2{margin:0;font-size:18px}.mhead small{color:var(--muted)}.run{border:1px solid var(--line);border-radius:10px;padding:13px 14px;margin-top:10px}.run.current{border-color:#bcd3ff;background:#fbfdff}.run-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.run-head b{font-size:13px;color:var(--ink)}.tag{background:#eef3fb;color:#3d6fd6;padding:2px 7px;border-radius:99px;font-size:10px;white-space:nowrap}.tag.cur{background:#e3f7ef;color:#147455}.ov-rec{font-size:12px;color:#7a5b13;background:#fff8e6;border:1px solid #f0e0ac;border-radius:8px;padding:8px 10px;margin-top:9px;line-height:1.6}.run details{margin-top:9px}.run summary{cursor:pointer;color:var(--blue);font-size:12px}.status{color:var(--green);font-size:12px;min-height:18px;margin-top:8px}.modal-backdrop{position:fixed;inset:0;background:#15202b55;display:grid;place-items:center;padding:20px;z-index:10}.modal{width:min(460px,100%);background:#fff;border-radius:12px;padding:20px}.modal h3{margin:0 0 4px;font-size:16px;letter-spacing:0;text-transform:none;color:var(--ink)}.modal .sub{font-size:12px;color:var(--muted)}.modal label{display:block;font-size:12px;color:var(--muted);margin-top:12px}.modal select,.modal input,.modal textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px;margin-top:5px;font:inherit}.modal textarea{min-height:70px;resize:vertical}.blocked{background:#ffe9eb;border:1px solid #f3c2c6;color:#a93942;border-radius:8px;padding:9px 11px;font-size:12px;margin-top:10px;line-height:1.6}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}@media(max-width:850px){.summary{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.row{grid-template-columns:1.2fr .8fr 1fr 50px 50px}}@media(max-width:600px){.app{padding:13px}.top{align-items:flex-start;gap:10px;flex-direction:column}.summary{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 60px 60px}.row>:nth-child(2),.row>:nth-child(3){display:none}}
+</style></head><body><main class="app"><header class="top"><div class="brand"><div class="logo">L</div><div><h1>License Lens · 合规裁决台</h1><small>可追溯的依赖许可证合规裁决</small></div></div><div class="actions"><span class="rule-badge" id="ruleBadge"></span><button id="export">导出审计报告</button><button id="reset">重置示例</button></div></header><section class="summary"><div class="metric"><small>依赖清单</small><b id="mManifests">0</b></div><div class="metric"><small>裁决批次</small><b id="mRuns">0</b></div><div class="metric"><small>当前高风险</small><b class="bad" id="mRisk">0</b></div><div class="metric"><small>人工覆盖记录</small><b class="warn" id="mOverrides">0</b></div></section><section class="grid"><aside class="panel"><h3>依赖清单</h3><div class="mlist" id="manifestList"></div><div class="divider"></div><h3>新建清单并检查</h3><input type="text" id="mName" placeholder="清单名称，如 gateway-api" style="width:100%;margin-bottom:8px"><input type="text" id="mProject" placeholder="所属项目（可选）" style="width:100%;margin-bottom:8px"><label class="hint" style="display:block;margin-bottom:6px">项目分发方式（将写入本次检查记录）<select id="mDist" style="width:100%;margin-top:5px"></select></label><textarea id="input" class="textarea" spellcheck="false" placeholder="每行一个依赖：名称@版本 许可证"></textarea><button id="analyze" class="primary" style="width:100%;margin-top:10px">保存清单并检查</button><div class="drop">拖放 package.json 或许可证清单<br><label for="file">选择文件<input id="file" type="file" accept=".txt,.json,.csv,.lock"></label></div><p class="hint">每次检查生成一个不可修改的裁决批次；同一依赖在新规则下重检只会追加新裁决，旧结论、依据与人工覆盖原因全部保留。</p><div class="status" id="status"></div></aside><section class="panel" id="detail"></section></section></main><div class="modal-backdrop" id="modal" style="display:none"><div class="modal"><h3 id="ovTitle">人工覆盖</h3><div class="sub" id="ovSub"></div><label>覆盖为<select id="ovTarget"><option value="pass">通过</option><option value="review">需复核</option><option value="risk">高风险</option></select></label><div class="blocked" id="ovBlocked" style="display:none"></div><label>覆盖原因（必填，将永久保留在裁决时间线中）<textarea id="ovReason" placeholder="例如：已补签内部使用授权，合同编号 …"></textarea></label><label>操作人<input type="text" id="ovAuthor" value="合规专员"></label><div class="modal-actions"><button id="ovCancel">取消</button><button id="ovSubmit" class="primary">记录覆盖</button></div></div></div><script>
+'use strict';
+/* ========== 规则与常量 ========== */
+const DIST={saas:'SaaS 内部分发',commercial:'商业分发（对外交付）',opensource:'开源发布',embedded:'嵌入式/设备分发'};
+const DIST_ORDER=['saas','commercial','opensource','embedded'];
+const RULES={'v1.0':'v1.0 旧版规则','v2.0':'v2.0 现行规则'};
+const CURRENT_RULE='v2.0';
+const CONC={pass:'通过',review:'需复核',risk:'高风险'};
+const GUARD_FAMS=['strong','agpl','proprietary']; // GPL 系与 Proprietary：结论绑定分发方式，高风险不得降为通过
+const LS_KEY='license-lens-console-v1';
+
+function familyOf(lic){
+  const l=(lic||'').toLowerCase();
+  if(l.includes('agpl'))return'agpl';
+  if(l.includes('lgpl'))return'weak';
+  if(l.includes('gpl'))return'strong';
+  if(l.includes('mpl')||l.includes('epl'))return'weak';
+  if(l.includes('proprietary')||l.includes('commercial')||l.includes('专有'))return'proprietary';
+  if(l.includes('mit')||l.includes('isc')||l.includes('bsd')||l.includes('apache')||l.includes('zlib')||l.includes('unlicense'))return'permissive';
+  if(l.includes('cc-by')||l.includes('cc0'))return'content';
+  return'unknown';
+}
+/* 许可证 × 分发方式 × 规则版本 → 结论 + 依据。GPL/Proprietary 在任何分发方式下都不会自动判通过。 */
+function evaluate(license,dist,rule){
+  const fam=familyOf(license),old=rule==='v1.0',d=DIST[dist];
+  switch(fam){
+    case'permissive':return{conclusion:'pass',basis:`${license} 为宽松许可证：保留版权与许可声明后，可在「${d}」场景使用与分发。`};
+    case'weak':
+      if(dist==='saas')return{conclusion:'pass',basis:`弱 Copyleft（${license}）：「${d}」不触发开源义务；若转为对外交付须按新分发方式重检。`};
+      if(old&&dist==='commercial')return{conclusion:'pass',basis:`v1.0 旧规则未将商业分发中的弱 Copyleft 列为复核项（现行规则已收紧）。`};
+      return{conclusion:'review',basis:`弱 Copyleft（${license}）：「${d}」场景需确认链接方式，修改过的受覆盖文件须开源。`};
+    case'strong':
+      if(dist==='saas')return old
+        ?{conclusion:'pass',basis:`v1.0 旧规则：内部使用不触发 GPL 分发条款（该结论已被现行规则取代，仅供历史核对）。`}
+        :{conclusion:'review',basis:`GPL 强 Copyleft：「${d}」暂不触发分发条款，但按现行规则保留标记、不得判为通过；一旦对外交付须重检。`};
+      return{conclusion:'risk',basis:`GPL 强 Copyleft：「${d}」场景下衍生作品须以 GPL 发布，与项目分发方式冲突。`};
+    case'agpl':
+      if(old&&dist==='saas')return{conclusion:'review',basis:`v1.0 旧规则未覆盖 AGPL 网络交互触发条款（现行规则已列为高风险）。`};
+      return{conclusion:'risk',basis:`AGPL 网络交互即触发 Copyleft：即使「${d}」也须向交互用户提供源码，任何分发方式下均为高风险。`};
+    case'proprietary':
+      if(dist==='saas')return old
+        ?{conclusion:'pass',basis:`v1.0 旧规则默认内部使用已获授权（现行规则要求逐项确认授权范围）。`}
+        :{conclusion:'review',basis:`专有许可证：需确认合同授权覆盖「${d}」内部使用范围，不得直接判为通过。`};
+      return{conclusion:'risk',basis:`专有许可证通常禁止再分发：与「${d}」分发方式冲突，需取得权利人书面授权。`};
+    case'content':return{conclusion:'review',basis:`${license} 为内容类许可证：需确认署名方式与使用场景。`};
+    default:return{conclusion:'review',basis:`未识别许可证「${license}」：需人工确认许可证文本与使用方式。`};
+  }
+}
+/* 高风险 GPL/Proprietary 不得降为通过（即使选择 SaaS 内部分发） */
+function overrideBlock(item,run,target){
+  if(target!=='pass')return null;
+  const cur=effective(run,item.id).conclusion;
+  if(GUARD_FAMS.includes(familyOf(item.license))&&cur==='risk')
+    return`「${item.license}」属于 GPL/Proprietary 高风险依赖，不得降为通过；切换「SaaS 内部分发」也不会清除该标记。`;
+  return null;
+}
+
+/* ========== 数据与持久化 ========== */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fmt=ts=>{const d=new Date(ts),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function makeItems(list){return list.map(([name,version,license],i)=>({id:'i'+uid()+i,name,version,license}))}
+function createRun(manifest,dist,rule,checkedAt){
+  return{id:uid(),ruleVersion:rule,distribution:dist,checkedAt:checkedAt||Date.now(),
+    rulings:manifest.items.map(it=>({itemId:it.id,license:it.license,...evaluate(it.license,dist,rule)})),
+    overrides:[]};
+}
+function seed(){
+  const now=Date.now(),d=864e5,h=36e5;
+  const m1={id:uid(),name:'gateway-api',project:'支付中台',createdAt:now-3*d,items:makeItems([
+    ['react','18.3.1','MIT'],['lodash','4.17.21','MIT'],['sharp','0.33.4','Apache-2.0'],
+    ['some-proprietary','1.0.0','Proprietary'],['legacy-gpl','2.4.0','GPL-3.0'],['agpl-report','1.2.0','AGPL-3.0'],
+    ['axios','1.7.2','MIT'],['zod','3.23.8','MIT'],['font-awesome','6.5.2','CC-BY-4.0']]),runs:[]};
+  const r1=createRun(m1,'saas','v1.0',now-3*d);
+  r1.overrides.push({id:uid(),itemId:m1.items[8].id,from:'review',to:'pass',reason:'仅用于内部管理台图标，已在关于页保留署名。',author:'法务 · 王敏',at:now-3*d+h});
+  const r2=createRun(m1,'saas','v2.0',now-1*d);
+  r2.overrides.push({id:uid(),itemId:m1.items[3].id,from:'review',to:'pass',reason:'已补签内部使用授权（合同 #PA-2026-118），授权范围覆盖 SaaS 内部部署。',author:'法务 · 王敏',at:now-1*d+2*h});
+  m1.runs.push(r1,r2);
+  const m2={id:uid(),name:'edge-agent',project:'终端采集',createdAt:now-12*h,items:makeItems([
+    ['busybox','1.36.1','GPL-2.0'],['zlib','1.3','Zlib'],['openssl','3.0.13','Apache-2.0']]),runs:[]};
+  m2.runs.push(createRun(m2,'embedded','v2.0',now-12*h));
+  return{manifests:[m1,m2],selectedId:m1.id};
+}
+let state;
+try{state=JSON.parse(localStorage.getItem(LS_KEY))||seed()}catch(e){state=seed()}
+const save=()=>localStorage.setItem(LS_KEY,JSON.stringify(state));
+
+/* ========== 查询 ========== */
+const manifest=()=>state.manifests.find(m=>m.id===state.selectedId)||state.manifests[0];
+const latestRun=m=>m.runs[m.runs.length-1];
+function effective(run,itemId){
+  const r=run.rulings.find(x=>x.itemId===itemId);if(!r)return{conclusion:'review',basis:'该依赖在本次检查时不存在。',auto:'review',overridden:false};
+  const ovs=run.overrides.filter(o=>o.itemId===itemId),last=ovs[ovs.length-1];
+  return last?{conclusion:last.to,basis:r.basis,auto:r.conclusion,overridden:true}:{conclusion:r.conclusion,basis:r.basis,auto:r.conclusion,overridden:false};
+}
+const counts=(m,run)=>{const c={pass:0,review:0,risk:0};m.items.forEach(it=>c[effective(run,it.id).conclusion]++);return c};
+
+/* ========== 渲染 ========== */
+let filter='all',query='',inspectId=null,ovItemId=null;
+const $=s=>document.querySelector(s);
+const badge=(c,extra)=>`<span class="badge ${c==='pass'?'ok':c}">${CONC[c]}</span>${extra||''}`;
+
+function renderMetrics(){
+  $('#mManifests').textContent=state.manifests.length;
+  $('#mRuns').textContent=state.manifests.reduce((n,m)=>n+m.runs.length,0);
+  $('#mRisk').textContent=state.manifests.reduce((n,m)=>m.runs.length?n+counts(m,latestRun(m)).risk:n,0);
+  $('#mOverrides').textContent=state.manifests.reduce((n,m)=>n+m.runs.reduce((k,r)=>k+r.overrides.length,0),0);
+  $('#ruleBadge').textContent='现行规则 '+CURRENT_RULE;
+}
+function renderList(){
+  $('#manifestList').innerHTML=state.manifests.map(m=>{
+    const run=latestRun(m),c=run?counts(m,run):{pass:0,review:0,risk:0};
+    return`<button class="mitem ${m.id===state.selectedId?'active':''}" data-action="select" data-id="${m.id}"><b>${esc(m.name)}</b> <small>${esc(m.project||'未标注项目')}</small><small>创建于 ${fmt(m.createdAt)}${run?` · 最近检查 ${fmt(run.checkedAt)}`:''}</small><div class="mbadges">${run?`<span class="tag">${DIST[run.distribution]}</span><span class="tag">${run.ruleVersion}</span>`:''}<span class="badge ok">${c.pass} 通过</span><span class="badge review">${c.review} 复核</span><span class="badge risk">${c.risk} 高风险</span></div></button>`;
+  }).join('')||'<p class="hint">暂无清单，请在下方新建。</p>';
+}
+function itemRow(m,run,it,withActions){
+  const ef=effective(run,it.id);
+  const ov=ef.overridden?`<span class="ovmark">已覆盖（原判 ${CONC[ef.auto]}）</span>`:'';
+  return`<div class="row"><div class="pkg"><div class="pkgicon">◈</div><div><b>${esc(it.name)}</b><br><span class="version">${esc(it.version)}</span></div></div><div class="license">${esc(it.license)}</div><div>${badge(ef.conclusion,ov)}</div><div class="inspect" data-action="inspect" data-id="${it.id}">查看依据</div><div>${withActions?`<button class="override-btn" data-action="override" data-id="${it.id}">覆盖</button>`:''}</div></div>`;
+}
+function renderDetail(){
+  const m=manifest(),box=$('#detail');
+  if(!m){box.innerHTML='<p class="hint">请选择或新建一份依赖清单。</p>';return}
+  const run=latestRun(m),c=counts(m,run);
+  const guarded=m.items.filter(it=>GUARD_FAMS.includes(familyOf(it.license)));
+  const showGuard=run.distribution==='saas'&&guarded.some(it=>effective(run,it.id).conclusion!=='pass');
+  const items=m.items.filter(it=>{
+    const ef=effective(run,it.id);
+    return(filter==='all'||ef.conclusion===filter)&&it.name.toLowerCase().includes(query);
+  });
+  const distOpts=DIST_ORDER.map(d=>`<option value="${d}" ${d===run.distribution?'selected':''}>${DIST[d]}</option>`).join('');
+  const ruleOpts=Object.keys(RULES).map(r=>`<option value="${r}" ${r===run.ruleVersion?'selected':''}>${RULES[r]}</option>`).join('');
+  box.innerHTML=`
+    <div class="mhead"><h2>${esc(m.name)} <small>· ${esc(m.project||'未标注项目')}</small></h2><small>清单创建于 ${fmt(m.createdAt)} · ${m.items.length} 个依赖 · 共 ${m.runs.length} 个裁决批次</small></div>
+    <div class="controls"><label>分发方式 <select id="distSel">${distOpts}</select></label><label>规则版本 <select id="ruleSel">${ruleOpts}</select></label><button class="primary" data-action="recheck">重新检查</button><span class="hint" style="margin:0">重检只生成新裁决批次，旧批次不可修改</span></div>
+    ${showGuard?`<div class="notice guard"><b>分发方式护栏</b><br>当前为「SaaS 内部分发」：GPL / Proprietary 依赖的标记已与本分发方式绑定保留，高风险不得降为通过。</div>`:''}
+    <div class="divider"></div>
+    <h3>当前结论 <span class="tag cur">批次 #${m.runs.length} · ${run.ruleVersion} · ${DIST[run.distribution]} · ${fmt(run.checkedAt)}</span></h3>
+    <div class="filters">${[['all','全部'],['pass','通过'],['review','需复核'],['risk','高风险']].map(([k,label])=>`<button class="${filter===k?'active':''}" data-action="filter" data-id="${k}">${label}${k==='all'?` ${m.items.length}`:''}</button>`).join('')}<input id="search" placeholder="搜索依赖…" value="${esc(query)}" style="margin-left:auto;border:1px solid var(--line);border-radius:7px;padding:7px;max-width:140px"></div>
+    <div class="row head"><div>依赖</div><div>许可证</div><div>结论</div><div>依据</div><div></div></div>
+    <div>${items.map(it=>itemRow(m,run,it,true)).join('')||'<p class="hint">没有匹配条目</p>'}</div>
+    <div class="details" id="details"></div>
+    <div class="divider"></div>
+    <h3>裁决时间线（旧批次只读，可逐批核对）</h3>
+    ${m.runs.map((r,i)=>renderRun(m,r,i,i===m.runs.length-1)).reverse().join('')}`;
+  const d=$('#details');
+  if(inspectId){const it=m.items.find(x=>x.id===inspectId);if(it)showDetails(m,it);else inspectId=null}
+  $('#search').oninput=e=>{query=e.target.value.toLowerCase();renderDetail()};
+}
+function renderRun(m,r,i,isLatest){
+  const c=counts(m,r);
+  const ovs=r.overrides.map(o=>{const it=m.items.find(x=>x.id===o.itemId);return`<div class="ov-rec">人工覆盖 · <b>${esc(it?it.name:o.itemId)}</b>：${CONC[o.from]} → ${CONC[o.to]}<br>原因：${esc(o.reason)}<br><span style="color:#a08c5a">${esc(o.author)} · ${fmt(o.at)}</span></div>`}).join('');
+  const rows=m.items.map(it=>{const ef=effective(r,it.id);const ov=ef.overridden?`<span class="ovmark">已覆盖（原判 ${CONC[ef.auto]}）</span>`:'';return`<div class="row"><div class="pkg"><div class="pkgicon">◈</div><div><b>${esc(it.name)}</b><br><span class="version">${esc(it.version)}</span></div></div><div class="license">${esc(it.license)}</div><div>${badge(ef.conclusion,ov)}</div><div></div><div></div></div>`}).join('');
+  return`<div class="run ${isLatest?'current':''}"><div class="run-head"><b>批次 #${i+1}</b><span>${fmt(r.checkedAt)}</span><span class="tag">${RULES[r.ruleVersion]||r.ruleVersion}</span><span class="tag">${DIST[r.distribution]}</span>${isLatest?'<span class="tag cur">当前</span>':''}<span class="badge ok">${c.pass} 通过</span><span class="badge review">${c.review} 复核</span><span class="badge risk">${c.risk} 高风险</span></div>${ovs}<details ${isLatest?'open':''}><summary>逐项结论与依据（${m.items.length}）</summary><div style="margin-top:8px">${rows}</div></details></div>`;
+}
+function showDetails(m,it){
+  const d=$('#details'),run=latestRun(m),ef=effective(run,it.id);
+  const hist=m.runs.map((r,i)=>{
+    const e2=effective(r,it.id);
+    const ovs=r.overrides.filter(o=>o.itemId===it.id).map(o=>`（人工覆盖 ${CONC[o.from]}→${CONC[o.to]}：${esc(o.reason)}）`).join('');
+    return`<li>${fmt(r.checkedAt)} · ${r.ruleVersion} · ${DIST[r.distribution]} → <b>${CONC[e2.conclusion]}</b>${ovs}</li>`;
+  }).join('');
+  d.style.display='block';
+  d.innerHTML=`<h4>${esc(it.name)} · ${esc(it.license)}</h4><p><b>当前依据</b>（批次 #${m.runs.length} · ${run.ruleVersion} · ${DIST[run.distribution]}）：${esc(ef.basis)}</p><p>裁决历史（旧结论与依据随批次永久保留）：</p><ul class="hist">${hist}</ul>`;
+}
+
+/* ========== 动作 ========== */
+function parseDeps(text){
+  return text.split(/\n|,/).map(s=>s.trim()).filter(Boolean).map(s=>{
+    let m=s.match(/^(.+?)@([\w.\-^~*]+)\s+(.+)$/);if(m)return[m[1],m[2],m[3].trim()];
+    m=s.match(/^(.+?)@([\w.\-^~*]+)$/);if(m)return[m[1],m[2],'Unknown'];
+    return[s,'—','Unknown'];
+  }).filter(x=>x[0]);
+}
+function setStatus(t){$('#status').textContent=t}
+function doRecheck(){
+  const m=manifest();if(!m)return;
+  const run=latestRun(m);
+  const dist=$('#distSel').value||run.distribution, rule=$('#ruleSel').value||run.ruleVersion;
+  m.runs.push(createRun(m,dist,rule));
+  inspectId=null;save();renderAll();
+  setStatus(`已生成裁决批次 #${m.runs.length}（${RULES[rule]} · ${DIST[dist]}），旧批次结论保留在时间线中`);
+}
+function doOverride(){
+  const m=manifest(),run=latestRun(m),it=m.items.find(x=>x.id===ovItemId);if(!it)return;
+  const target=$('#ovTarget').value,reason=$('#ovReason').value.trim(),author=$('#ovAuthor').value.trim()||'合规专员';
+  if(overrideBlock(it,run,target))return;
+  if(!reason){$('#ovReason').focus();return}
+  run.overrides.push({id:uid(),itemId:it.id,from:effective(run,it.id).conclusion,to:target,reason,author,at:Date.now()});
+  closeModal();save();renderAll();
+  setStatus(`已记录人工覆盖：${it.name} → ${CONC[target]}，原因已写入批次 #${m.runs.length}`);
+}
+function openOverride(itemId){
+  const m=manifest(),run=latestRun(m),it=m.items.find(x=>x.id===itemId);if(!it)return;
+  ovItemId=itemId;
+  $('#ovTitle').textContent=`人工覆盖 · ${it.name}`;
+  $('#ovSub').textContent=`当前结论：${CONC[effective(run,it.id).conclusion]}（批次 #${m.runs.length} · ${run.ruleVersion} · ${DIST[run.distribution]}）`;
+  $('#ovReason').value='';$('#ovTarget').value=effective(run,it.id).conclusion==='pass'?'review':'pass';
+  syncOverrideGuard();$('#modal').style.display='grid';
+}
+function syncOverrideGuard(){
+  const m=manifest(),run=latestRun(m),it=m.items.find(x=>x.id===ovItemId);
+  const msg=it?overrideBlock(it,run,$('#ovTarget').value):null;
+  $('#ovBlocked').style.display=msg?'block':'none';
+  $('#ovBlocked').textContent=msg||'';
+  $('#ovSubmit').disabled=!!msg;
+  $('#ovSubmit').style.opacity=msg?0.45:1;
+}
+function closeModal(){$('#modal').style.display='none';ovItemId=null}
+function exportMd(){
+  const lines=['# License Lens 合规审计报告','',`生成时间：${fmt(Date.now())} · 现行规则 ${CURRENT_RULE}`,''];
+  state.manifests.forEach(m=>{
+    lines.push(`## 清单：${m.name}（${m.project||'未标注项目'}）`,`创建时间：${fmt(m.createdAt)} · 依赖数 ${m.items.length}`,'');
+    m.runs.forEach((r,i)=>{
+      lines.push(`### 裁决批次 #${i+1} — ${fmt(r.checkedAt)} · 规则 ${r.ruleVersion} · ${DIST[r.distribution]}`,'','| 依赖 | 版本 | 许可证 | 结论 | 依据 |','|---|---|---|---|---|');
+      m.items.forEach(it=>{const ef=effective(r,it.id);lines.push(`| ${it.name} | ${it.version} | ${it.license} | ${CONC[ef.conclusion]}${ef.overridden?`（覆盖自${CONC[ef.auto]}）`:''} | ${ef.basis} |`)});
+      r.overrides.forEach(o=>{const it=m.items.find(x=>x.id===o.itemId);lines.push(`\n> 人工覆盖：${it?it.name:o.itemId} ${CONC[o.from]} → ${CONC[o.to]}。原因：${o.reason}（${o.author} · ${fmt(o.at)}）`)});
+      lines.push('');
+    });
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/markdown'}));
+  a.download='license-audit.md';a.click();
+  setStatus('审计报告已导出（含全部裁决批次与人工覆盖记录）');
+}
+function renderAll(){renderMetrics();renderList();renderDetail()}
+
+/* ========== 事件 ========== */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-action]');if(!t)return;
+  const a=t.dataset.action,id=t.dataset.id;
+  if(a==='select'){state.selectedId=id;inspectId=null;filter='all';query='';save();renderAll()}
+  if(a==='filter'){filter=id;renderDetail()}
+  if(a==='inspect'){inspectId=id;renderDetail();const d=$('#details');d&&d.scrollIntoView({block:'nearest'})}
+  if(a==='override')openOverride(id);
+  if(a==='recheck')doRecheck();
+});
+$('#analyze').onclick=()=>{
+  const deps=parseDeps($('#input').value);
+  const name=$('#mName').value.trim()||`清单-${state.manifests.length+1}`;
+  if(!deps.length){setStatus('请先粘贴或上传依赖清单');return}
+  const m={id:uid(),name,project:$('#mProject').value.trim(),createdAt:Date.now(),items:makeItems(deps),runs:[]};
+  m.runs.push(createRun(m,$('#mDist').value,CURRENT_RULE));
+  state.manifests.push(m);state.selectedId=m.id;
+  $('#input').value='';$('#mName').value='';$('#mProject').value='';
+  save();renderAll();
+  setStatus(`清单「${name}」已保存并完成首次检查（批次 #1 · ${CURRENT_RULE}）`);
+};
+$('#file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{let text=String(r.result);
+    try{const j=JSON.parse(text);if(j&&typeof j==='object'&&!Array.isArray(j)){const deps={...(j.dependencies||{}),...(j.devDependencies||{})};if(Object.keys(deps).length)text=Object.entries(deps).map(([k,v])=>`${k}@${v}`).join('\n')}}catch(_){}
+    $('#input').value=text;setStatus(`已载入 ${f.name}，确认后点击「保存清单并检查」`)};
+  r.readAsText(f);
+};
+$('#export').onclick=exportMd;
+$('#reset').onclick=()=>{if(confirm('重置将清空全部清单与裁决历史，恢复示例数据。继续？')){state=seed();save();renderAll();setStatus('已恢复示例数据')}};
+$('#ovCancel').onclick=closeModal;
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+$('#ovTarget').onchange=syncOverrideGuard;
+$('#ovSubmit').onclick=doOverride;
+
+/* ========== 初始化 ========== */
+$('#mDist').innerHTML=DIST_ORDER.map(d=>`<option value="${d}">${DIST[d]}</option>`).join('');
+renderAll();
 </script></body></html>
